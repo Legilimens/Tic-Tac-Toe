@@ -17,5 +17,6 @@ module.exports = {
   rules: {
     "no-console": "off",
     "no-plusplus": "off",
+    "no-param-reassign": "off",
   },
 };
