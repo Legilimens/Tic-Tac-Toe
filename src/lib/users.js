@@ -10,6 +10,10 @@ function clearUsers() {
   return users;
 }
 
+function findUserById(userId) {
+  return users.find((el) => el.id === userId);
+}
+
 function findUserByEmail(email) {
   return users.find((el) => el.email === email);
 }
@@ -34,6 +38,7 @@ async function addUser(email, password) {
 module.exports = {
   users,
   clearUsers,
+  findUserById,
   findUserByEmail,
   checkMatchPassword,
   addUser,

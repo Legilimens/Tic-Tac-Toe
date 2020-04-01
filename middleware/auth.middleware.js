@@ -14,8 +14,11 @@ function authMiddleware(req, res, next) {
     }
 
     const decodedToken = jwt.decode(token, config.get('jwtSecret'));
-    req.user = decodedToken;
-    return next();
+    if (decodedToken) {
+      req.user = decodedToken;
+      return next();
+    }
+    return res.status(401).json({ message: 'Отсутствует авторизация!' });
   } catch (e) {
     return res.status(401).json({ message: 'Отсутствует авторизация!' });
   }

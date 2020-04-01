@@ -16,24 +16,28 @@ router.post(
     check('password', 'Минимальная длина пароля 6 символов!').isLength({ min: 6 }),
   ],
   async (req, res) => {
-    const { email, password } = req.body;
-    const errors = validationResult(req);
+    try {
+      const { email, password } = req.body;
+      const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        message: 'Допущены ошибки в регистрационных данных!',
-        errors: errors.array(),
-      });
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          message: 'Допущены ошибки в регистрационных данных!',
+          errors: errors.array(),
+        });
+      }
+
+      const candidate = users.findUserByEmail(email);
+      if (candidate) {
+        return res.status(400).json({ message: 'Такой пользователь уже существует!' });
+      }
+
+      await users.addUser(email, password);
+
+      return res.status(201).json({ message: 'Пользователь создан' });
+    } catch (e) {
+      return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
     }
-
-    const candidate = users.findUserByEmail(email);
-    if (candidate) {
-      return res.status(400).json({ message: 'Такой пользователь уже существует!' });
-    }
-
-    await users.addUser(email, password);
-
-    return res.status(201).json({ message: 'Пользователь создан' });
   },
 );
 
@@ -44,48 +48,151 @@ router.post(
     check('password', 'Необходимо ввести пароль!').exists(),
   ],
   async (req, res) => {
-    const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          message: 'Допущены ошибки в данных авторизации!',
+          errors: errors.array(),
+        });
+      }
+
+      const user = users.findUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'Неверный email и/или пароль, попробуйте снова!' });
+      }
+
+      const isPasswordMatch = await users.checkMatchPassword(password, user.password);
+      if (!isPasswordMatch) {
+        return res.status(400).json({ message: 'Неверный email и/или пароль, попробуйте снова!' });
+      }
+
+      const token = jwt.sign(
+        { userId: user.id },
+        config.get('jwtSecret'),
+        { expiresIn: '1h' },
+      );
+
+      return res.json({ token });
+    } catch (e) {
+      return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+    }
+  },
+);
+
+router.get('/getGameList', (req, res) => {
+  try {
+    return res.send(controller.getGameList());
+  } catch (e) {
+    return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+  }
+});
+
+router.get('/createGame', auth.authMiddleware, (req, res) => {
+  try {
+    controller.createGame(req.user.userId);
+    return res.status(201).json({ message: 'Комната успешно создана' });
+  } catch (e) {
+    return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+  }
+});
+
+router.post(
+  '/joinToGame',
+  [
+    auth.authMiddleware,
+    check('gameId', 'Отсутствует идентификатор игры!').exists(),
+  ],
+  (req, res) => {
+    try {
+      const { gameId } = req.body;
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          message: 'Допущены ошибки!',
+          errors: errors.array(),
+        });
+      }
+
+      const game = controller.joinToGame(req.user.userId, gameId);
+      return res.send(game);
+    } catch (e) {
+      return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+    }
+  },
+);
+
+router.get('/getField', check('gameId', 'Отсутствует идентификатор игры!').exists(), (req, res) => {
+  try {
+    const { gameId } = req.body;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).json({
-        message: 'Допущены ошибки в данных авторизации!',
+        message: 'Допущены ошибки!',
         errors: errors.array(),
       });
     }
 
-    const user = users.findUserByEmail(email);
-    if (!user) {
-      return res.status(400).json({ message: 'Неверный email и/или пароль, попробуйте снова!' });
+    return res.send(controller.getField(gameId));
+  } catch (e) {
+    return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+  }
+});
+
+router.get(
+  '/resetField',
+  [
+    check('gameId', 'Отсутствует идентификатор игры!').exists(),
+    auth.authMiddleware,
+  ],
+  (req, res) => {
+    try {
+      const { gameId } = req.body;
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          message: 'Допущены ошибки!',
+          errors: errors.array(),
+        });
+      }
+
+      return res.send(controller.reset(req.user.userId, gameId));
+    } catch (e) {
+      return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
     }
-
-    const isPasswordMatch = await users.checkMatchPassword(password, user.password);
-    if (!isPasswordMatch) {
-      return res.status(400).json({ message: 'Неверный email и/или пароль, попробуйте снова!' });
-    }
-
-    const token = jwt.sign(
-      { userId: user.id },
-      config.get('jwtSecret'),
-      { expiresIn: '1h' },
-    );
-
-    return res.json({ token });
   },
 );
 
-router.get('/getField', (req, res) => {
-  res.send(controller.getField());
-});
+router.post(
+  '/move',
+  [
+    check('gameId', 'Отсутствует идентификатор игры!').exists(),
+    auth.authMiddleware,
+  ],
+  (req, res) => {
+    try {
+      const { gameId, x, y } = req.body;
+      const errors = validationResult(req);
 
-router.get('/resetField', auth.authMiddleware, (req, res) => {
-  res.send(controller.reset());
-});
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          message: 'Допущены ошибки!',
+          errors: errors.array(),
+        });
+      }
 
-router.post('/move', auth.authMiddleware, (req, res) => {
-  const { x, y } = req.body;
-  const move = controller.makeMove(x, y);
-  res.status(statuses[move.status]).send(move);
-});
+      const move = controller.makeMove(req.user.userId, gameId, x, y);
+
+      return res.status(statuses[move.status]).send(move);
+    } catch (e) {
+      return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+    }
+  },
+);
 
 module.exports = router;
