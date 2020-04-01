@@ -92,8 +92,8 @@ router.get('/getGameList', (req, res) => {
 
 router.get('/createGame', auth.authMiddleware, (req, res) => {
   try {
-    controller.createGame(req.user.userId);
-    return res.status(201).json({ message: 'Комната успешно создана' });
+    const game = controller.createGame(req.user.userId);
+    return res.status(201).json({ message: 'Игра успешно создана', game });
   } catch (e) {
     return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
   }
@@ -125,7 +125,7 @@ router.post(
   },
 );
 
-router.get('/getField', check('gameId', 'Отсутствует идентификатор игры!').exists(), (req, res) => {
+router.post('/getField', check('gameId', 'Отсутствует идентификатор игры!').exists(), (req, res) => {
   try {
     const { gameId } = req.body;
     const errors = validationResult(req);

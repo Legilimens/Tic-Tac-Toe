@@ -76,9 +76,9 @@ function getField(gameId) {
  * Изменить текущего игрока
  * @param {Number}
  */
-function switchCurrentPlayer(gameId) {
+function setCurrentPlayer(gameId, player) {
   const game = gameList.find((el) => el.gameId === gameId);
-  game.currentPlayer = game.currentPlayer !== 1 ? 1 : 2;
+  game.currentPlayer = player;
 }
 
 /**
@@ -118,7 +118,7 @@ function makeMove(userId, gameId, x, y) {
         return { status: 'won', player: game.currentPlayer };
       }
       // изменяем текущего игрока
-      switchCurrentPlayer(gameId);
+      setCurrentPlayer(gameId, game.currentPlayer !== 1 ? 1 : 2);
       // возвращаем успех
       return { status: 'ok' };
     }
@@ -168,7 +168,7 @@ module.exports = {
   getGameList,
   getField,
   checkValidMove,
-  switchCurrentPlayer,
+  setCurrentPlayer,
   makeMove,
   reset,
   presetField,
