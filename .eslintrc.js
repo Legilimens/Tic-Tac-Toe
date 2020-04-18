@@ -18,5 +18,7 @@ module.exports = {
     "no-console": "off",
     "no-plusplus": "off",
     "no-param-reassign": "off",
+    "func-names": "off",
+    "linebreak-style": 0
   },
 };
