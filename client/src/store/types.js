@@ -1,11 +1,7 @@
-export const SHOW_LOADER = 'APP/SHOW_LOADER';
-export const HIDE_LOADER = 'APP/HIDE_LOADER';
-export const SHOW_ALERT = 'APP/SHOW_ALERT';
-export const HIDE_ALERT = 'APP/HIDE_ALERT';
-
-export const CREATE_SYNC_POST = 'POST/CREATE_POST';
-export const FETCH_POSTS = 'POST/FETCH_POSTS';
+export const SET_USER_ID = 'APP/SET_USER_ID';
+export const SET_IS_AUTH = 'APP/SET_IS_AUTH';
 
 export const SET_GAME_LIST = 'GAME/SET_GAME_LIST';
 export const FETCH_GAME_LIST = 'GAME/FETCH_GAME_LIST';
 export const FETCH_GAME_DATA = 'GAME/FETCH_GAME_DATA';
+export const SET_CURRENT_GAME = 'GAME/SET_CURRENT_GAME';

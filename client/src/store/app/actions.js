@@ -1,23 +1,19 @@
 import {
-  SHOW_LOADER, HIDE_LOADER, SHOW_ALERT, HIDE_ALERT,
+  SET_USER_ID
 } from '../types';
 
-export const showAlert = (text) => (dispatch) => {
-  dispatch({
-    type: SHOW_ALERT,
-    payload: text,
-  });
-  setTimeout(() => {
-    dispatch({
-      type: HIDE_ALERT,
-    });
-  }, 3 * 1000);
+
+export const setUserId = (userId) => ({
+  type: SET_USER_ID,
+  payload: userId,
+});
+
+export const setIsAuth = (value) => ({
+  type: SET_IS_AUTH,
+  payload: value,
+});
+
+export const authUser = (userId) => (dispatch) => {
+  dispatch(setUserId(userId));
+  dispatch(setIsAuth(true));
 };
-
-export const showLoader = () => ({
-  type: SHOW_LOADER,
-});
-
-export const hideLoader = () => ({
-  type: HIDE_LOADER,
-});

@@ -67,9 +67,18 @@ function getGameList() {
  * Получить текущее состояние поля
  * @return {Array}
  */
+function getGame(gameId) {
+  const game = gameList.find((el) => el.gameId === gameId);
+  return game || {};
+}
+
+/**
+ * Получить текущее состояние поля
+ * @return {Array}
+ */
 function getField(gameId) {
   const game = gameList.find((el) => el.gameId === gameId);
-  return game.field;
+  return game.field || {};
 }
 
 /**
@@ -166,6 +175,7 @@ module.exports = {
   createGame,
   joinToGame,
   getGameList,
+  getGame,
   getField,
   checkValidMove,
   setCurrentPlayer,

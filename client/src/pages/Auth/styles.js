@@ -7,8 +7,17 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     minHeight: 140,
-    width: 400,
+    width: 600,
+    padding: theme.spacing(4),
   },
+  field: {
+    marginBottom: theme.spacing(2),
+  },
+  button: {
+    marginTop: theme.spacing(3),
+    marginRigt: theme.spacing(2),
+    marginLeft: theme.spacing(2),
+  }
 }));
 
 export default useStyles;

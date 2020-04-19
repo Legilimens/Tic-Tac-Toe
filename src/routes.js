@@ -75,7 +75,7 @@ router.post(
         { expiresIn: '1h' },
       );
 
-      return res.json({ token });
+      return res.json({ token, userId: user.id });
     } catch (e) {
       return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
     }
@@ -124,6 +124,24 @@ router.post(
     }
   },
 );
+
+router.post('/getGame', check('gameId', 'Отсутствует идентификатор игры!').exists(), (req, res) => {
+  try {
+    const { gameId } = req.body;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: 'Допущены ошибки!',
+        errors: errors.array(),
+      });
+    }
+
+    return res.send(controller.getGame(gameId));
+  } catch (e) {
+    return res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова...' });
+  }
+});
 
 router.post('/getField', check('gameId', 'Отсутствует идентификатор игры!').exists(), (req, res) => {
   try {

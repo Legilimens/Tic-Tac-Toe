@@ -13,15 +13,17 @@ function useRoutes(isAuthenticated) {
           <Profile />
         </Route>
       )}
+      {!isAuthenticated && (
+        <Route path="/auth" exact>
+          <Auth />
+        </Route>
+      )}
     
       <Route path="/" exact>
         <GameList />
       </Route>
       <Route path="/game/:id">
         <Game />
-      </Route>
-      <Route path="/auth" exact>
-        <Auth />
       </Route>
       <Redirect to="/" />
     </Switch>

@@ -3,18 +3,14 @@ import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-
-import useGameList from '../../hooks/useGameList';
+import { useGameList } from '../../hooks';
 import useStyles from './styles';
 import GameWrapper from '../../components/GameWrapper/GameWrapper';
 
 function GameList() {
   const gameList = useGameList();
   const classes = useStyles();
-
-  useEffect(() => {
-  }, [gameList]);
-
+  console.log(gameList);
   const handleNewGame = () => {
 
   };
